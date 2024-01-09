@@ -1,0 +1,29 @@
+if quote.price_with_slippage > 180:
+    print(f'Swapping {quote.amount_in} to {quote.amount_out_with_slippage}')
+    # Prepare a transaction group
+    transaction_group = pool.prepare_swap_transactions_from_quote(quote)
+    # Sign the group with our key
+    transaction_group.sign_with_private_key(account['address'], account['private_key'])
+    # Submit transactions to the network and wait for confirmation
+    result = client.submit(transaction_group, wait=True)
+
+
+  excess = pool.fetch_excess_amounts()
+    if TINYUSDC in excess:
+        amount = excess[TINYUSDC]
+        print(f'Excess: {amount}')
+        # We might just let the excess accumulate rather than redeeming if its < 1 TinyUSDC
+        if amount > 5:
+            transaction_group = pool.prepare_redeem_transactions(amount)
+            transaction_group.sign_with_private_key(account['address'], account['private_key'])
+            result = client.submit(transaction_group, wait=True)
+
+if(not client.is_opted_in()):
+    print('Account not opted into app, opting in now..')
+    transaction_group = client.prepare_app_optin_transactions()
+    transaction_group.sign_with_private_key('W56X7W2ANMOJANBIYKQ3G3EHNO7XPFULYWJDMA355R4THPPFYQUSC5LFSU', account['private_key'])
+    result = client.submit(transaction_group, wait=True)
+else :
+    print('account opted in')
+
+TrwsapqvTEiA/9K8EGagQcpzOgC6qVHdE6F4NjXgUBa3fX/bQGsckDQowqGzbIdrv3eWi8WSNgN97HkzveXEKQ==
